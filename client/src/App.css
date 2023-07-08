@@ -1,0 +1,64 @@
+.scroll {
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+.scroll::-webkit-scrollbar:vertical {
+  width: 6px;
+}
+
+.scroll::-webkit-scrollbar-thumb:horizontal {
+  height: 2px !important;
+  width: 2px !important;
+}
+
+.box-title {
+  /* color: var(--text-color-gray, #8898AA);  */
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-align: center;
+}
+
+.ggBtns {
+  width: 124px;
+  height: 44px;
+  box-shadow: 3px 4px 7px #D6D9DF;
+  text-transform: capitalize !important;
+}
+
+.submitBtn {
+  min-width: 90px;
+  min-height: 43px;
+  text-transform: capitalize !important;
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.08), 0px 4px 6px 0px rgba(50, 50, 93, 0.11) !important;
+  border-radius: 4px !important;
+  background-color: #5E72E4;
+}
+
+.heading {
+  color: #FFFFFF;
+  text-align: center;
+  margin-top: 10px !important;
+  font-size: 26px;
+}
+
+.description {
+  color: var(--text-color-white, #FFF);
+  text-align: center;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 27px;
+  margin-top: 8px;
+}
+
+.box {
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
+  background: #F7FAFC;
+  border-radius: 6px;
+  padding: 32px 0px;
+  margin-top: 40px;
+}
