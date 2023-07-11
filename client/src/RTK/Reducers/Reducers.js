@@ -2,14 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-const APIS = {
-  login: '/api/login',
-  signup: '/signup',
-  forgot: '/forgot',
-  resetpassword: '/resetpassword',
-}
-
-
+import { APIS } from '../../utils/EndPoints';
 
 // ------------------All Asyn Reducers are below ------------------//
 let initialState = {

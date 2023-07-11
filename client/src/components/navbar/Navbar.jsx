@@ -14,8 +14,7 @@ const Navbar = () => {
     await fireBase.auth().signOut();
     dispatch(LOG_OUT())
   }
-
-
+console.log('currentUser',currentUser);
 
   return (
     <div>
@@ -23,7 +22,7 @@ const Navbar = () => {
         <NavLink to='/'><Box component='img' src={logo} alt='logo' sx={{ width: '61px', height: '59px' }} /></NavLink>
         <Stack direction='row' alignItems='center' justifyContent={'center'} spacing={1}>
           {currentUser && currentUser?.avatar && <Avatar className="header-Profile-icon" alt={currentUser?.name} src={currentUser?.avatar} />}
-          {currentUser && !(currentUser?.avatar) && <Avatar className="header-Profile-icon" >{(currentUser?.name).charAt(0).toUpperCase()}</Avatar>}
+          {currentUser && !(currentUser?.avatar) && <Avatar className="header-Profile-icon" >{(currentUser?.name)?.charAt(0).toUpperCase()}</Avatar>}
           {currentUser && <Box sx={{ color: '#FFFFFF' }}>{currentUser?.name}</Box>}
           {currentUser && <ButtonBase sx={style} onClick={handleLogOut} >Log Out</ButtonBase>}
           {!currentUser && <NavLink to='/login'><ButtonBase sx={{ height: '43px', width: '86px', color: '#F1EFFC' }} >Login</ButtonBase></NavLink>}

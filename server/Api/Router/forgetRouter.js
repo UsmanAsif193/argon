@@ -1,78 +1,70 @@
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
-const async = require('async');
-const crypto = require('crypto');
 const UserForgot = require('../../Database/model/forgotModel');
-const axios = require('axios');
+const jwt = require('jsonwebtoken');
+const CONFIG = require('../../config.js');
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  host: "smtp.gmail.com",
+  auth: {
+    user: CONFIG.my_mail_address,
+    pass: CONFIG.my_mail_password,
+  }
+});
 
-router.post('/', function (req, res, next) {
-  let token = '';
-  const URL = 'https://argon-e77aa99b12fa.herokuapp.com/reset/';
-  // const URL = 'http://localhost:3000/reset/';
-  async.waterfall([
-    function (done) {
-      crypto.randomBytes(20, function (err, buf) {
-        token = buf.toString('hex');
-        done(err, token);
-      });
-    },
-    function (token, done) {
-      var userForgot = new UserForgot();
 
-      userForgot.resetPasswordToken = token;
-      userForgot.resetPasswordExpires = Date.now() + 3600000;
-      userForgot.email = req.body.email;
 
-      userForgot
-        .save()
-        .then(() => {
-          done(null, token, userForgot);
-        })
-        .catch((err) => {
-          console.error(err);
-          done(err);
-        });
-    },
-    function (token, userForgot, done) {
-      var mailData = {
-        sender: {
-          name: 'Argon ',
-          email: 'hamad.softdev@gmail.com',
-        },
-        to: [
-          {
-            email: userForgot.email,
-          },
-        ],
-        subject: 'Argon (forgot password)',
-        textContent:
-          'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+// const URL = 'https://argon-e77aa99b12fa.herokuapp.com/reset/';
+const URL = 'http://localhost:3000/reset/';
+
+router.post('/', async (req, res) => {
+  const secretKey = 'your-secret-key'; // Replace with your own secret key
+  const token = jwt.sign({ email: req.body.email }, secretKey, { expiresIn: '30m' });
+
+  try {
+
+    const mailSenderFunction = async (mail, token) => {
+      let mailOptions = {
+        from: { name: 'Argon Forgot Password', address: 'address' },
+        to: `${mail}`,
+        subject: 'Argon Forgot Password Request',
+        text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
           'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
           URL + token + '\n\n' +
           'If you did not request this, please ignore this email and your password will remain unchanged.\n',
       };
 
-      axios
-        .post('https://api.sendinblue.com/v3/smtp/email', mailData, {
-          headers: {
-            'Content-Type': 'application/json',
-            'api-key': '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',
-          },
-        })
-        .then((response) => {
-          done(null, 'done');
-        })
-        .catch((err) => {
-          console.error(err);
-          done(err);
-        });
+      // Send email
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error);
+          res.send({ success: false, message: 'Error to send Mail' });
+        } else {
+          console.log('Email sent: ' + info.response);
+          res.send({ success: true, message: 'Your e-mail has been sent.' });
+        }
+      });
     }
-  ], function (err) {
-    if (err) return next(err);
-    // Send the response after the async waterfall is completed
-    res.send({ success: true, message: 'Your e-mail has been sent.' });
-  });
+
+    const userForgot = new UserForgot({
+      resetPasswordToken: token,
+      resetPasswordExpires: Date.now() + 3600000,
+      email: req.body.email,
+    });
+
+    await userForgot
+      .save()
+      .then(() => {
+        mailSenderFunction(req.body.email, token);
+      })
+      .catch((err) => {
+        res.status(500).send({ 'message': 'Internal Server Error' })
+      });
+  } catch (error) {
+    res.status(500).send({ 'message': 'Internal Server Error' })
+  }
+
 });
 
 module.exports = router;

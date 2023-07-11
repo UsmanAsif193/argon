@@ -61,8 +61,8 @@ const Reset = () => {
                     <Box className='box' >
                         <Typography className='box-title' mb='18px'>Reset password</Typography>
                         <Box px='46px'>
-                            {(resetError) && <Alert sx={{ mt: '20px', '& .MuiPaper-root': { borderRadius: '10px' } }} severity="error">{(resetError)}!</Alert>}
-                            {(resetSuccess) && <Alert sx={{ mt: '20px', '& .MuiPaper-root': { borderRadius: '10px' } }} severity="success">{(resetSuccess)}!</Alert>}
+                            {(resetError) && <Alert sx={{ my: '20px', '& .MuiPaper-root': { borderRadius: '10px' } }} severity="error">{(resetError)}!</Alert>}
+                            {(resetSuccess) && <Alert sx={{ my: '20px', '& .MuiPaper-root': { borderRadius: '10px' } }} severity="success">{(resetSuccess)}!</Alert>}
                         </Box>
                         <Stack alignItems='center' justifyContent={'center'} spacing={2} px='48px' mb='40px'
                             component='form' onSubmit={handleSubmit(handleForgotReset)} noValidate

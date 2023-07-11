@@ -1,17 +1,69 @@
 import React from 'react';
-import { auth, provider } from './firebase';
 import { Button } from '@mui/material';
-
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { CLEAR_OUT, LOGIN_WITH_GOOGLE_APPLE } from '../../RTK/Reducers/Reducers';
+import { config } from '../../utils/config';
+ 
 const GitHubAuth = () => {
-  const signInWithGitHub = () => {
-    auth.signInWithPopup(provider)
-      .catch((error) => {
-        console.error('Error signing in with GitHub:', error);
-      }).then(() => console.log(provider))
+  const { client_id, redirect_uri, proxy_url } = config;
+  const dispatch = useDispatch();
+
+  const HasCodeDealer = async (hasCode) => {
+    if (hasCode) {
+      try {
+        const response = await axios.post(proxy_url, { code: hasCode });
+        const user = response.data;
+        // console.log('proxy_url', user);
+        dispatch(CLEAR_OUT());
+        dispatch(LOGIN_WITH_GOOGLE_APPLE({
+          _id: user.node_id,
+          email: user.login,
+          name: user.name,
+          avatar: user.avatar_url
+        }))
+      } catch (error) {
+        console.log('proxy_url error', error);
+      }
+    }
+  }
+
+  const handleGitHub = () => {
+    const width = 600;
+    const height = 600;
+    const left = window.innerWidth / 2 - width / 2;
+    const top = window.innerHeight / 2 - height / 2;
+    const popup = window.open(
+      `https://github.com/login/oauth/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=user:email`,
+      "githubLogin",
+      `width=${width},height=${height},top=${top},left=${left}`
+    );
+
+    const checkPopupClosed = setInterval(() => {
+      if (popup.closed) {
+        clearInterval(checkPopupClosed);
+        // Perform any necessary actions after the popup window is closed
+        // For example, handle the case when the user closes the popup without providing the code
+      } else {
+        try {
+          const popupUrl = popup.location.href;
+          if (popupUrl.includes('?code=')) {
+            const [base, code] = popupUrl.split("?code=");
+            console.log('Extracted code:', code);
+            popup.close();
+            clearInterval(checkPopupClosed);
+            HasCodeDealer(code);
+          }
+        } catch (error) {
+          // Ignore the cross-origin error when accessing the popup's location
+          console.log(error);
+        }
+      }
+    }, 1000);
   };
 
   return (
-    <Button className='ggBtns' startIcon={gitHubIcon} onClick={signInWithGitHub}>
+    <Button className='ggBtns' startIcon={gitHubIcon} onClick={handleGitHub}>
       Github
     </Button>
   );

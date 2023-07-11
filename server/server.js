@@ -8,6 +8,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser');
+const AuthGitHubRouter = require('./Api/Router/AuthGitHubRouter');
 
 
 app.use(cors());
@@ -25,6 +26,7 @@ app.use('/signup', userRouter);
 app.use('/api/login', loginRouter);
 app.use('/forgot', forgetRouter);
 app.use('/resetpassword', resetRouter);
+app.use('/authenticate', AuthGitHubRouter);
 
 
 // ===========Deploy Purposes===========//
